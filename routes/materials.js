@@ -2,15 +2,14 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
 
-// Fetch Materials Endpoint
+// Fetch all materials
 router.get('/', async (req, res) => {
   try {
-    const query = 'SELECT * FROM material';
-    const result = await pool.query(query);
-    res.json(result.rows);
+    const result = await pool.query('SELECT MaterialID, MaterialName, RatePerSqFt FROM Material ORDER BY MaterialID ASC');
+    res.json(result.rows); // Ensure MaterialName and RatePerSqFt are returned correctly
   } catch (error) {
     console.error('Error fetching materials:', error);
-    res.status(500).json({ success: false, error: 'Database error' });
+    res.status(500).json({ error: 'Failed to fetch materials.' });
   }
 });
 
