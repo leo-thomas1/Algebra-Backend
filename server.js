@@ -88,6 +88,9 @@ app.use("/api/admin-orders", AdminOrderEditRoutes);
 
 
 
+app.get('/', (req, res) => {
+  res.json({ message: "Welcome to MyOrder API" });
+});
 
 
 // Handle 404 for unmatched routes
