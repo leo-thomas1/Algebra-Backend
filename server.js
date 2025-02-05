@@ -1,7 +1,17 @@
+
+require('dotenv').config();
+
+// Ensure JWT_SECRET is loaded before starting the server
+if (!process.env.JWT_SECRET) {
+    console.error("FATAL ERROR: JWT_SECRET is missing! Check your .env file.");
+    process.exit(1); // Stop the server if JWT_SECRET is missing
+}
+
+console.log("Loaded JWT_SECRET:", process.env.JWT_SECRET); // Debugging
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-require("dotenv").config();
 
 
 // Import Routes
