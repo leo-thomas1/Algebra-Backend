@@ -1,7 +1,9 @@
 require("dotenv").config(); // Load environment variables
 const jwt = require("jsonwebtoken");
 
-const SECRET_KEY = process.env.JWT_SECRET; // Ensure it matches .env
+const SECRET_KEY = process.env.JWT_SECRET;  // ✅ Correct
+console.log("Using JWT_SECRET in auth.js:", SECRET_KEY);
+
 
 const authenticateUser = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
