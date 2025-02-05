@@ -6,8 +6,9 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-const SECRET_KEY = process.env.JWT_SECRET;  // ✅ Correct
-console.log("Using JWT_SECRET in auth.js:", SECRET_KEY);
+const SECRET_KEY = process.env.JWT_SECRET || "fallbackSecret";  // ✅ Correct
+console.log("Using JWT_SECRET in Login.js:", SECRET_KEY); // Debugging
+
 
 router.post("/", async (req, res) => {
   const { username, password } = req.body;
