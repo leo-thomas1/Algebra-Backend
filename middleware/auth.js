@@ -1,7 +1,7 @@
 require("dotenv").config(); // Load environment variables
 const jwt = require("jsonwebtoken");
 
-const SECRET_KEY = process.env.SECRET_KEY;
+const SECRET_KEY = process.env.JWT_SECRET; // Ensure it matches .env
 
 const authenticateUser = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
