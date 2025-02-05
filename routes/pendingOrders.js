@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
-const authenticateUser = require('../middleware/auth'); // Include authentication middleware
+const authenticateUser = require('../middleware/auth');
 
 // Fetch all pending orders
 router.get("/", authenticateUser, async (req, res) => {
