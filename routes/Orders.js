@@ -226,33 +226,33 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
 });
 
 // Update a specific child order
-router.put("/order-child/:childOrderId/update", authenticateUser, async (req, res) => {
-  const { childOrderId } = req.params;
-  const { wastageCharge, orderStatus } = req.body;
+// router.put("/order-child/:childOrderId/update", authenticateUser, async (req, res) => {
+//   const { childOrderId } = req.params;
+//   const { wastageCharge, orderStatus } = req.body;
 
-  if (!orderStatus) {
-    return res.status(400).json({ error: "Order status is required." });
-  }
+//   if (!orderStatus) {
+//     return res.status(400).json({ error: "Order status is required." });
+//   }
 
-  try {
-    const query = `
-      UPDATE order_child
-      SET wastagecharge = $1, orderstatus = $2
-      WHERE order_cid = $3
-      RETURNING *;
-    `;
-    const result = await pool.query(query, [wastageCharge, orderStatus, childOrderId]);
+//   try {
+//     const query = `
+//       UPDATE order_child
+//       SET wastagecharge = $1, orderstatus = $2
+//       WHERE order_cid = $3
+//       RETURNING *;
+//     `;
+//     const result = await pool.query(query, [wastageCharge, orderStatus, childOrderId]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Child order not found or not updated." });
-    }
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "Child order not found or not updated." });
+//     }
 
-    res.status(200).json({ success: true, message: "Child order updated successfully.", order: result.rows[0] });
-  } catch (error) {
-    console.error("Error updating child order:", error);
-    res.status(500).json({ error: "Failed to update child order." });
-  }
-});
+//     res.status(200).json({ success: true, message: "Child order updated successfully.", order: result.rows[0] });
+//   } catch (error) {
+//     console.error("Error updating child order:", error);
+//     res.status(500).json({ error: "Failed to update child order." });
+//   }
+// });
 
 
 // Route to fetch filtered orders
