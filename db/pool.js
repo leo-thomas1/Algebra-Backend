@@ -1,12 +1,11 @@
-const { Pool } = require('pg');
+const { Pool } = require("pg");
+require("dotenv").config();
 
 const pool = new Pool({
-  user: 'algebraadmin',
-  host: 'algebra1.ctqaoyew8pt1.ap-south-1.rds.amazonaws.com',
-  database: 'postgres',
-  password: 'Merinjai',
-  port: 5432, // Default PostgreSQL port
-  ssl: { rejectUnauthorized: false }
-
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Required for Railway PostgreSQL
+  },
 });
+
 module.exports = pool;
