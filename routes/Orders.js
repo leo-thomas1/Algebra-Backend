@@ -182,9 +182,6 @@ router.get("/designer/:userId", authenticateUser, async (req, res) => {
   }
 });
 
-// Inside orders.js
-
-// Fetch details of a specific child order
 router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
   const { childOrderId } = req.params;
 
@@ -197,7 +194,10 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
         om.billdate,
         c.name AS customername,
         c.phonenumber,
+        m.materialid,
         m.materialname,
+        m.ratepersqft,
+        m.wastagecharge AS material_wastage_rate,  -- ✅ From Material table
         oc.printingtype,
         oc.length,
         oc.height,
@@ -205,6 +205,8 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
         oc.totalarea,
         oc.amount,
         oc.wastagecharge,
+        oc.wastagelength,
+        oc.wastageheight,
         oc.orderstatus
       FROM order_child oc
       JOIN order_master om ON oc.orderid = om.orderid
@@ -212,6 +214,7 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
       JOIN material m ON oc.materialid = m.materialid
       WHERE oc.order_cid = $1;
     `;
+
     const result = await pool.query(query, [childOrderId]);
 
     if (result.rows.length === 0) {
@@ -224,6 +227,50 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch child order details." });
   }
 });
+
+
+// Inside orders.js
+
+// Fetch details of a specific child order
+// router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
+//   const { childOrderId } = req.params;
+
+//   try {
+//     const query = `
+//       SELECT 
+//         oc.order_cid AS child_order_id,
+//         oc.orderid AS master_order_id,
+//         om.invoicenumber,
+//         om.billdate,
+//         c.name AS customername,
+//         c.phonenumber,
+//         m.materialname,
+//         oc.printingtype,
+//         oc.length,
+//         oc.height,
+//         oc.quantity,
+//         oc.totalarea,
+//         oc.amount,
+//         oc.wastagecharge,
+//         oc.orderstatus
+//       FROM order_child oc
+//       JOIN order_master om ON oc.orderid = om.orderid
+//       JOIN customer c ON om.customerid = c.customerid
+//       JOIN material m ON oc.materialid = m.materialid
+//       WHERE oc.order_cid = $1;
+//     `;
+//     const result = await pool.query(query, [childOrderId]);
+
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "Child order not found." });
+//     }
+
+//     res.status(200).json(result.rows[0]);
+//   } catch (error) {
+//     console.error("Error fetching child order details:", error);
+//     res.status(500).json({ error: "Failed to fetch child order details." });
+//   }
+// });
 
 
 
