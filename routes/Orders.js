@@ -194,11 +194,7 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
         om.billdate,
         c.name AS customername,
         c.phonenumber,
-        m.materialid,
-        m.materialname,
-        CAST(m.ratepersqft AS NUMERIC(10,2)) AS ratepersqft,                 -- Ensure correct type
-        CAST(m.wastagecharge AS NUMERIC(10,2)) AS material_wastage_rate,    -- Ensure it's available
-        oc.printingtype,
+      
         oc.length,
         oc.height,
         oc.quantity,
