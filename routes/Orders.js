@@ -196,8 +196,8 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
         c.phonenumber,
         m.materialid,
         m.materialname,
-        m.ratepersqft,
-        m.wastagecharge AS material_wastage_rate,  -- ✅ From Material table
+        CAST(m.ratepersqft AS NUMERIC(10,2)) AS ratepersqft,                 -- Ensure correct type
+        CAST(m.wastagecharge AS NUMERIC(10,2)) AS material_wastage_rate,    -- Ensure it's available
         oc.printingtype,
         oc.length,
         oc.height,
@@ -221,9 +221,12 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
       return res.status(404).json({ error: "Child order not found." });
     }
 
+    // ✅ Debug log
+    console.log("✅ Final Fetched Order Data:", result.rows[0]);
+
     res.status(200).json(result.rows[0]);
   } catch (error) {
-    console.error("Error fetching child order details:", error);
+    console.error("❌ Error fetching child order details:", error);
     res.status(500).json({ error: "Failed to fetch child order details." });
   }
 });
