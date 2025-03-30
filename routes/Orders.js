@@ -225,7 +225,8 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
   }
 });
 
-// Update a specific child order
+
+
 // router.put("/order-child/:childOrderId/update", authenticateUser, async (req, res) => {
 //   const { childOrderId } = req.params;
 //   const { wastageCharge, orderStatus } = req.body;
@@ -235,47 +236,73 @@ router.get("/order-child/:childOrderId", authenticateUser, async (req, res) => {
 //   }
 
 //   try {
-//     const query = `
+//     // Update the child order status
+//     const updateQuery = `
 //       UPDATE order_child
 //       SET wastagecharge = $1, orderstatus = $2
 //       WHERE order_cid = $3
-//       RETURNING *;
+//       RETURNING orderid;
 //     `;
-//     const result = await pool.query(query, [wastageCharge, orderStatus, childOrderId]);
+//     const updateResult = await pool.query(updateQuery, [wastageCharge ?? 0, orderStatus, childOrderId]);
 
-//     if (result.rows.length === 0) {
+//     if (updateResult.rows.length === 0) {
 //       return res.status(404).json({ error: "Child order not found or not updated." });
 //     }
 
-//     res.status(200).json({ success: true, message: "Child order updated successfully.", order: result.rows[0] });
+//     const masterOrderId = updateResult.rows[0].orderid;
+
+//     // Check if all child orders for this master order are printed
+//     const checkQuery = `
+//       SELECT COUNT(*) AS pending_count
+//       FROM order_child
+//       WHERE orderid = $1 AND orderstatus != 'Printed';
+//     `;
+//     const checkResult = await pool.query(checkQuery, [masterOrderId]);
+
+//     if (checkResult.rows[0].pending_count == 0) {
+//       // Update the Master Order status to 'Printed'
+//       const updateMasterQuery = `
+//         UPDATE order_master
+//         SET orderstatus = 'Printed'
+//         WHERE orderid = $1;
+//       `;
+//       await pool.query(updateMasterQuery, [masterOrderId]);
+//     }
+
+//     res.status(200).json({ success: true, message: "Child order updated successfully." });
 //   } catch (error) {
 //     console.error("Error updating child order:", error);
 //     res.status(500).json({ error: "Failed to update child order." });
 //   }
 // });
-
-
-// Route to fetch filtered orders
-
-// Route to fetch filtered child orders
-
 router.put("/order-child/:childOrderId/update", authenticateUser, async (req, res) => {
   const { childOrderId } = req.params;
-  const { wastageCharge, orderStatus } = req.body;
+  const { wastageCharge, wastageLength, wastageHeight, orderStatus } = req.body;
 
   if (!orderStatus) {
     return res.status(400).json({ error: "Order status is required." });
   }
 
   try {
-    // Update the child order status
+    // ✅ Update child order with new wastage length, height & charge
     const updateQuery = `
       UPDATE order_child
-      SET wastagecharge = $1, orderstatus = $2
-      WHERE order_cid = $3
+      SET 
+        wastagecharge = $1,
+        wastagelength = $2,
+        wastageheight = $3,
+        orderstatus = $4
+      WHERE order_cid = $5
       RETURNING orderid;
     `;
-    const updateResult = await pool.query(updateQuery, [wastageCharge ?? 0, orderStatus, childOrderId]);
+
+    const updateResult = await pool.query(updateQuery, [
+      wastageCharge ?? 0,
+      wastageLength ?? 0,
+      wastageHeight ?? 0,
+      orderStatus,
+      childOrderId
+    ]);
 
     if (updateResult.rows.length === 0) {
       return res.status(404).json({ error: "Child order not found or not updated." });
@@ -283,7 +310,7 @@ router.put("/order-child/:childOrderId/update", authenticateUser, async (req, re
 
     const masterOrderId = updateResult.rows[0].orderid;
 
-    // Check if all child orders for this master order are printed
+    // ✅ Check if all child orders are 'Printed'
     const checkQuery = `
       SELECT COUNT(*) AS pending_count
       FROM order_child
@@ -292,7 +319,7 @@ router.put("/order-child/:childOrderId/update", authenticateUser, async (req, re
     const checkResult = await pool.query(checkQuery, [masterOrderId]);
 
     if (checkResult.rows[0].pending_count == 0) {
-      // Update the Master Order status to 'Printed'
+      // ✅ Update master order status if all printed
       const updateMasterQuery = `
         UPDATE order_master
         SET orderstatus = 'Printed'
@@ -307,6 +334,7 @@ router.put("/order-child/:childOrderId/update", authenticateUser, async (req, re
     res.status(500).json({ error: "Failed to update child order." });
   }
 });
+
 
 
 router.get('/child-orders', async (req, res) => {
